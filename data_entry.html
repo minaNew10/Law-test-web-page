@@ -55,30 +55,8 @@
             </p>
 			<p><input id="btnSaveQuestion" type = "submit" value = "حفظ"></input></p>
 	</form>
-	<script type = "text/javascript">
-		document.getElementById("btnSaveBranchedCategory").onclick = function(){
-			
-			var text = document.getElementById("txtBranchedCatName").value
-			alert(" تم حفظ التصنيف الفرعي " + text)
-		}
-		document.getElementById("btnSaveMainCategory").onclick = function(){
-			var text = document.getElementById("txtMainCatName").value
-			alert(" تم حفظ التصنيف الرئيسي " + text )
-		}
-		document.getElementById("btnSaveQuestion").onclick = function(){
-			alert(" تم حفظ السؤال " + displayRadioValue())
-		}
+	<script type = "text/javascript" src="script.js"></script>
 		
-		function displayRadioValue() { 
-            var ele = document.getElementsByName("difficulty"); 
-            var text 
-            for(i = 0; i < ele.length; i++) { 
-                if(ele[i].checked) 
-					text = ele[i].value; 
-            }
-			return text;
-        } 
-		
-	</script>
+	
 </body>
 </html>
