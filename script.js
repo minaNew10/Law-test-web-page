@@ -1,13 +1,17 @@
+var categories
 
-document.getElementById("btnSaveBranchedCategory").onclick = function(){
-	
-	var text = document.getElementById("txtBranchedCatName").value
-	
-}
 document.getElementById("btnSaveMainCategory").onclick = function(){
 	var text = document.getElementById("txtMainCatName").value
 	
 	writeMainCategory(text)
+}
+document.getElementById("btnSaveBranchedCategory").onclick = function(){
+	
+	var text = document.getElementById("txtBranchedCatName").value
+	var index = document.getElementById("selectCat0").selectedIndex
+	var key = categories[index].key
+	writeBranchedCategory(text,key)
+	
 }
 document.getElementById("btnSaveQuestion").onclick = function(){
 	alert(" تم حفظ السؤال " )
@@ -23,9 +27,12 @@ function getRadioValue() {
 	return text;
 } 
 	  intializeFirebase()
+	  
 	  firebase.database().ref("categories").once("value").then(function(snapshot) {
 	  categories = makeCategoryList(snapshot)
+	  console.log(categories[0].key)
 	  createSelectOptions(categories)
+	  
       
 		/*
 		var arrKeys = Object.keys(snapshot.val())
@@ -64,6 +71,12 @@ function writeMainCategory(category){
 	})
 }
 
+function writeBranchedCategory(category,key){
+	firebase.database().ref("categories/" + key).push({
+		name : category
+	})
+}
+
 function makeCategoryList(snapshot) {
   var catKeys = Object.keys(snapshot.val())
   var catValues = Object.values(snapshot.val())
@@ -96,6 +109,7 @@ function createSelectOptions(arr){
 	var elements = document.getElementsByClassName("mainCatSelect");
 	for (var i = 0; i < elements.length; i++) {
 		copy = newSelect.cloneNode(true)
+		copy.id = "selectCat" + i
 		elements[i].appendChild(copy)
 	}
 }
