@@ -2,15 +2,19 @@ var categories
 
 document.getElementById("btnSaveMainCategory").onclick = function(){
 	var text = document.getElementById("txtMainCatName").value
-	
+	console.log(text)
 	writeMainCategory(text)
 }
 document.getElementById("btnSaveBranchedCategory").onclick = function(){
 	
-	var text = document.getElementById("txtBranchedCatName").value
-	var index = document.getElementById("selectCat0").selectedIndex
-	var key = categories[index].key
-	writeBranchedCategory(text,key)
+	var branchedCat = document.getElementById("txtBranchedCatName").value
+	var select = document.getElementById("selectCat0")
+	var index = select.selectedIndex
+	var optionsItems = select.options
+	var mainCat = optionsItems[index].text
+	
+	document.getElementById("object").innerHTML = mainCat; 
+	writeBranchedCategory(branchedCat,mainCat)
 	
 }
 document.getElementById("btnSaveQuestion").onclick = function(){
@@ -30,7 +34,7 @@ function getRadioValue() {
 	  
 	  firebase.database().ref("categories").once("value").then(function(snapshot) {
 	  categories = makeCategoryList(snapshot)
-	  console.log(categories[0].key)
+	
 	  createSelectOptions(categories)
 	  
       
@@ -66,14 +70,14 @@ function intializeFirebase(){
 }	
 function writeMainCategory(category){
 	alert(" تم حفظ التصنيف الرئيسي " + category )
-	firebase.database().ref("categories").push({
+	firebase.database().ref("categories/" + category).set({
 		name : category
 	})
 }
 
-function writeBranchedCategory(category,key){
-	firebase.database().ref("categories/" + key).push({
-		name : category
+function writeBranchedCategory(branchedCat,mainCat){	
+	firebase.database().ref("categories/" + mainCat + "/"  + branchedCat).set({
+		name : branchedCat
 	})
 }
 
@@ -99,7 +103,6 @@ function createSelectOptions(arr){
 	var newSelect= document.createElement("select");
 	for(i = 0; i < arr.length; i++){
 	   var opt = document.createElement("option");
-	   console.log(arr[i].name)
 	   
 	   opt.value = arr[i].name;
 	   opt.innerHTML = arr[i].name; // whatever property it has
@@ -108,8 +111,9 @@ function createSelectOptions(arr){
 	}
 	var elements = document.getElementsByClassName("mainCatSelect");
 	for (var i = 0; i < elements.length; i++) {
-		copy = newSelect.cloneNode(true)
-		copy.id = "selectCat" + i
+        copy = newSelect.cloneNode(true)
+		copy.setAttribute("id" , "selectCat" + i)
+		
 		elements[i].appendChild(copy)
 	}
 }
