@@ -10,10 +10,10 @@ document.getElementById("btnSaveMainCategory").onclick = function(){
 	writeMainCategory(text)
 }
 document.getElementById("btnSaveQuestion").onclick = function(){
-	alert(" تم حفظ السؤال " + displayRadioValue())
+	alert(" تم حفظ السؤال " )
 }
 
-function displayRadioValue() { 
+function getRadioValue() { 
 	var ele = document.getElementsByName("difficulty"); 
 	var text 
 	for(i = 0; i < ele.length; i++) { 
@@ -22,7 +22,30 @@ function displayRadioValue() {
 	}
 	return text;
 } 
-	  var firebaseConfig = {
+	  intializeFirebase()
+	  firebase.database().ref("categories").once("value").then(function(snapshot) {
+	  categories = makeCategoryList(snapshot)
+	  createSelectOptions(categories)
+      
+		/*
+		var arrKeys = Object.keys(snapshot.val())
+		var category = {name:"",key:"",branches : {}}
+		var arrValues = Object.values(snapshot.val())
+		category = arrValues[0]
+		category.key = arrKeys[0]
+		//document.getElementById("object").innerHTML = JSON.stringify(category.name + category.key, null, 2); 
+		 snapshot.forEach(function(childSnapshot){
+			   var childKey = childSnapshot.key;
+			   var data = childSnapshot.val();
+		   //  document.getElementById("object").innerHTML = JSON.stringify(snapshot.val(), null, 2); 
+		    // document.getElementById("object").innerHTML = JSON.stringify(childSnapshot.val(), null, 2); 
+		     document.getElementById("object").innerHTML = JSON.stringify(childKey, null, 2); 
+		  });
+		  */
+	});
+	
+function intializeFirebase(){
+	 var firebaseConfig = {
 		apiKey: "AIzaSyBMreciTLPtbvTuCKiSBt48LVDOouQVwLg",
 		authDomain: "law-test-7a1ff.firebaseapp.com",
 		databaseURL: "https://law-test-7a1ff.firebaseio.com",
@@ -33,15 +56,47 @@ function displayRadioValue() {
 	  };
 	  
 	  firebase.initializeApp(firebaseConfig);
-	  firebase.database().ref("categories").once("value").then(function(snapshot) {
-		document.getElementById("object").innerHTML = JSON.stringify(snapshot.val(), null, 2); 
-	});
-	
-	
+}	
 function writeMainCategory(category){
 	alert(" تم حفظ التصنيف الرئيسي " + category )
 	firebase.database().ref("categories").push({
 		name : category
 	})
+}
+
+function makeCategoryList(snapshot) {
+  var catKeys = Object.keys(snapshot.val())
+  var catValues = Object.values(snapshot.val())
+  var categories = []
+  var category = {name:"",key:"",category : {}}
+  for(i = 0; i < catValues.length; i++) { 
+	category = catValues[i]
+	category.key = catKeys[i]
+	categories.push(category)
+ } 
+ return categories 
+}
+function populatDoc(categories){
+	document.getElementById("object").innerHTML = JSON.stringify(categories[0].name, null, 2);
+}
+//pass array of type category
+function createSelectOptions(arr){
+	questionBar = document.getElementById("questionClassBar")
+	branchedBar = document.getElementById("branchedCategroyPar")
+	var newSelect= document.createElement("select");
+	for(i = 0; i < arr.length; i++){
+	   var opt = document.createElement("option");
+	   console.log(arr[i].name)
+	   
+	   opt.value = arr[i].name;
+	   opt.innerHTML = arr[i].name; // whatever property it has
+	   // then append it to the select element
+	   newSelect.appendChild(opt);
+	}
+	var elements = document.getElementsByClassName("mainCatSelect");
+	for (var i = 0; i < elements.length; i++) {
+		copy = newSelect.cloneNode(true)
+		elements[i].appendChild(copy)
+	}
 }
 
