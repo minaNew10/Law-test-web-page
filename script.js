@@ -1,4 +1,3 @@
-var categories
 
 document.getElementById("btnSaveMainCategory").onclick = function(){
 	var text = document.getElementById("txtMainCatName").value
@@ -9,6 +8,7 @@ document.getElementById("btnSaveBranchedCategory").onclick = function(){
 	
 	var branchedCat = document.getElementById("txtBranchedCatName").value
 	var select = document.getElementById("selectCat0")
+    
 	var index = select.selectedIndex
 	var optionsItems = select.options
 	var mainCat = optionsItems[index].text
@@ -18,6 +18,11 @@ document.getElementById("btnSaveBranchedCategory").onclick = function(){
 	
 }
 document.getElementById("btnSaveQuestion").onclick = function(){
+	var select = document.getElementById("selectCat1")
+	var index = select.selectedIndex
+	var optionsItems = select.options
+	var mainCat = optionsItems[index].text
+	
 	alert(" تم حفظ السؤال " )
 }
 
@@ -31,13 +36,28 @@ function getRadioValue() {
 	return text;
 } 
 	  intializeFirebase()
+	  getMainCategories()
+	  getBranchedCategories("دولي")
 	  
-	  firebase.database().ref("categories").once("value").then(function(snapshot) {
-	  categories = makeCategoryList(snapshot)
-	
-	  createSelectOptions(categories)
+
+function getMainCategories(){
+  firebase.database().ref("categories").once("value").then(function(snapshot) {
+  categories = makeCategoryList(snapshot)
+  console.log("Categories " + categories) 
+  createMainCatSelectOptions(categories)
+  
+  }); 
+ 
+}
+function getBranchedCategories(mainCat){
+	firebase.database().ref("categories/" + mainCat).once("value").then(function(snapshot) {
+    
+	branchedCategories = makeCategoryList(snapshot)
+	createBrancedCatSelectOptions(branchedCategories)
+  
+  }); 
+}
 	  
-      
 		/*
 		var arrKeys = Object.keys(snapshot.val())
 		var category = {name:"",key:"",branches : {}}
@@ -53,7 +73,7 @@ function getRadioValue() {
 		     document.getElementById("object").innerHTML = JSON.stringify(childKey, null, 2); 
 		  });
 		  */
-	});
+
 	
 function intializeFirebase(){
 	 var firebaseConfig = {
@@ -80,26 +100,30 @@ function writeBranchedCategory(branchedCat,mainCat){
 		name : branchedCat
 	})
 }
-
+function createQuestion(){
+	var question = {
+		
+	}
+}
 function makeCategoryList(snapshot) {
   var catKeys = Object.keys(snapshot.val())
   var catValues = Object.values(snapshot.val())
   var categories = []
-  var category = {name:"",key:"",category : {}}
+  var category = {name:"",key:""}
   for(i = 0; i < catValues.length; i++) { 
 	category = catValues[i]
-	category.key = catKeys[i]
 	categories.push(category)
  } 
+
  return categories 
 }
 function populatDoc(categories){
 	document.getElementById("object").innerHTML = JSON.stringify(categories[0].name, null, 2);
 }
 //pass array of type category
-function createSelectOptions(arr){
-	questionBar = document.getElementById("questionClassBar")
-	branchedBar = document.getElementById("branchedCategroyPar")
+function createMainCatSelectOptions(arr){
+	
+	
 	var newSelect= document.createElement("select");
 	for(i = 0; i < arr.length; i++){
 	   var opt = document.createElement("option");
@@ -116,5 +140,46 @@ function createSelectOptions(arr){
 		
 		elements[i].appendChild(copy)
 	}
+	//get the selection of the mainCat to view it's corresponding branched ones
+	var select = document.getElementById("selectCat1")
+	var index = select.selectedIndex
+	var optionsItems = select.options
+	var mainCat = optionsItems[index].text
+	getBranchedCategories(mainCat)
+	
+	 document.getElementById("selectCat1").onchange = function(){
+	    var index = select.selectedIndex
+		var mainCat = optionsItems[index].text
+		getBranchedCategories(mainCat)
+		}
+		
 }
+
+function createBrancedCatSelectOptions(branchedCategories){
+	branchedBar = document.getElementById("branchedCatSelect")
+	selectBranched = document.getElementById("branchedCat") 
+	if(document.getElementById("branchedCat") != null){
+		branchedBar.removeChild(selectBranched)
+	}
+	//check if it is already present in order not to create it again
+	
+		var newSelect= document.createElement("select");
+		
+		if(branchedCategories.length != 0){
+			for(i = 0; i < branchedCategories.length; i++){
+				if(branchedCategories[i].name != null){
+				   var opt = document.createElement("option");	   
+				   opt.value = branchedCategories[i].name;
+				   opt.innerHTML = branchedCategories[i].name; // whatever property it has
+				   // then append it to the select element
+				   
+				   newSelect.appendChild(opt);
+				}
+			}
+		}
+		newSelect.setAttribute("id","branchedCat")
+		branchedBar.appendChild(newSelect)
+	
+}
+
 
