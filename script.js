@@ -3,40 +3,43 @@
 getMainCategories()
 document.getElementById("btnSaveMainCategory").onclick = function(){
 	var text = document.getElementById("txtMainCatName").value
-	
-	writeMainCategory(text)
+	if(text.trim() == ""){
+		alert("أنت لم تدخل اسم التصنيف ")
+	}else{
+		writeMainCategory(text)
+	}	
 }
 document.getElementById("btnSaveBranchedCategory").onclick = function(){
 	
 	var branchedCat = document.getElementById("txtBranchedCatName").value
 	var select = document.getElementById("selectCat0")    
 	mainCat = getSelectValue(select)	
-	writeBranchedCategory(branchedCat,mainCat)
+	
+	if(branchedCat.trim() == ""){
+		alert("أنت لم تدخل اسم التصنيف ")
+	}else{
+		writeBranchedCategory(branchedCat,mainCat)
+	}	
 	
 }
-document.getElementById("btnSaveQuestion").onclick = function(){
-	/*var select = document.getElementById("selectCat1")
-	var index = select.selectedIndex
-	var optionsItems = select.options
-	var mainCat = optionsItems[index].text
+document.getElementById("btnSaveQuestion").onclick = function(){	
 	question = createQuestion()
-	
-	writeQuestion(question)
-	alert(" تم حفظ السؤال " )*/
-	var selectMain = document.getElementById("selectCat1")
-	var selectbranched = document.getElementById("branchedCat")
-	
-	var mainClassification = getSelectValue(selectMain)
-	
-	
-	var branchedClassification = getSelectValue(selectBranched)
-	
-	alert(mainClassification + " " + branchedClassification)
-	
+	if(question.questionBody.trim() == "" 
+		|| question.choices[1].trim() == ""
+		|| question.choices[2].trim() == ""
+		|| question.choices[3].trim() == "" 
+		|| question.choices[4].trim() == "" 
+		|| question.correctAnswer.trim() == ""
+		|| question.ansRef.trim() == ""
+		|| question.difficulty == null){
+		alert("عناصر السؤال غير مكتملة، لا يمكن الحفظ")
+	}else{
+		writeQuestion(question)
+	}
 }
 
 function createQuestion(){
-	var questionBody = document.getElementById("question")
+	var questionBody = document.getElementById("question").value
 	var choice1 = document.getElementById("txtFirstChoice").value
 	var choice2 = document.getElementById("txtSecChoice").value
 	var choice3 = document.getElementById("txtThirdChoice").value
@@ -57,7 +60,7 @@ function createQuestion(){
 	
 	var branchedClassification = getSelectValue(selectBranched)
 	
-	var classification  = getSelectValue(selectBranched)+ " " + getSelectValue(selectMain)
+	var classification  = getSelectValue(selectMain)+ " " + getSelectValue(selectBranched)
 	classification = classification.replace(/\s/g, "_");
 	var question = {
 		questionBody : questionBody,
@@ -70,13 +73,22 @@ function createQuestion(){
 	return question
 }
 function writeQuestion(question){
-	firebase.database().ref("questions/" + question.classification).set({
-		ques : question
-	})
+	
+	firebase.database().ref("questions/" + question.classification + "/" + question.difficulty).push(question)
+	alert("تم حفظ السؤال ")
+	document.getElementById("question").value = ""
+	document.getElementById("txtFirstChoice").value = ""
+	document.getElementById("txtSecChoice").value = ""
+    document.getElementById("txtThirdChoice").value = ""
+	document.getElementById("txtForChoice").value = ""
+	document.getElementById("txtCorrectAns").value = ""
+	document.getElementById("ansReference").value = ""
+	document.getElementsByName("difficulty").checked = false
 }
  
 function getMainCategories(){
   firebase.database().ref("categories").once("value").then(function(snapshot) {
+	  console.log("snapshot : " + snapshot)
 	  categories = makeCategoryList(snapshot)
 	  createMainCatSelectOptions(categories)
   }); 
@@ -101,16 +113,18 @@ function getBranchedCategories(mainCat){
   }); 
 }
 function writeMainCategory(category){
-	alert(" تم حفظ التصنيف الرئيسي " + category )
 	firebase.database().ref("categories/" + category).set({
 		name : category
 	})
+	alert(" تم حفظ التصنيف الرئيسي " + category )
 }
 
 function writeBranchedCategory(branchedCat,mainCat){	
 	firebase.database().ref("categories/" + mainCat + "/"  + branchedCat).set({
 		name : branchedCat
 	})
+	
+	alert("تم حفظ التصنيف الفرعي  " + branchedCat )
 }
 
 

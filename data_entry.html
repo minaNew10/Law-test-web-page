@@ -7,7 +7,7 @@
 </head>
 <body>
 	<pre id='object'></pre>
-	<form>
+	<form onsubmit= "return false">
 		<h1>إدخال البيانات</h1>
 		<h2>إضافة تصنيف رئيسي</h2>
 		<p> إسم التصنيف : <input id = "txtMainCatName"type = "text"></input> 
@@ -21,10 +21,10 @@
 						<input id = "btnSaveBranchedCategory" type = "submit"  value = "حفظ"></input>
 		</p>
 	</form>
-	<form>
+	<form onsubmit= "return false">
 		<h2>إضافة سؤال</h2>
 			
-		    <p>  نص السؤال :&nbsp&nbsp&nbsp&nbsp<br/><textarea name="question" rows="2" cols="30"> </textarea>   </p>
+		    <p>  نص السؤال :&nbsp&nbsp&nbsp&nbsp<br/><textarea id="question" rows="2" cols="30"> </textarea>   </p>
 		    <p> الإختيار الأول  : <br/><textarea id= "txtFirstChoice" name="first_ans" rows="2" cols="30"> </textarea> 	</p>		
 			<p>الإختيار الثاني : <br/><textarea id= "txtSecChoice" name="second_ans" rows="2" cols="30"> </textarea> 	</p>		
 			<p>الإختيار الثالث : <br/><textarea id= "txtThirdChoice" name="third_ans" rows="2" cols="30"> </textarea> 	</p>		
